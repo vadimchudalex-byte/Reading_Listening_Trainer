@@ -1,0 +1,2736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Wrong Backpack — Reading & Speaking Trainer</title>
+<style>
+:root{
+  --bg:#f5f0e6;
+  --paper:#fffdf7;
+  --ink:#263238;
+  --muted:#6b6b6b;
+  --accent:#2f6f6d;
+  --accent2:#d98262;
+  --good:#4f8a4f;
+  --bad:#b94f4f;
+  --line:#d9d1c3;
+  --chip:#eef4f1;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:linear-gradient(180deg,#f4efe5 0%,#eee7d8 100%);
+  color:var(--ink);
+}
+.app{
+  max-width:980px;
+  margin:0 auto;
+  padding:18px;
+}
+.topbar{
+  display:flex;
+  gap:16px;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  margin-bottom:18px;
+}
+.title-wrap h1{margin:0;font-size:clamp(28px,4vw,46px)}
+.subtitle{color:var(--muted);margin-top:4px}
+.progress-wrap{min-width:250px;flex:1;max-width:420px}
+.progress-label{font-size:13px;color:var(--muted);margin-bottom:6px;text-align:right}
+.progress{
+  height:10px;background:#ded7ca;border-radius:999px;overflow:hidden
+}
+.progress > div{
+  height:100%;width:0;background:var(--accent);transition:width .35s ease
+}
+.card{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:22px;
+  box-shadow:0 10px 30px rgba(60,45,25,.08);
+  margin-bottom:18px;
+}
+.hidden{display:none!important}
+.scene-kicker{
+  font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700
+}
+.scene-title{font-size:28px;margin:4px 0 12px}
+.story{
+  font-size:20px;
+  line-height:1.75;
+}
+.story p{margin:0 0 14px}
+.choice-line{
+  padding:10px 12px;
+  border-radius:12px;
+  background:#faf7ef;
+  border:1px solid #ece5d9;
+  margin:10px 0;
+}
+.choice{
+  font:inherit;
+  font-size:18px;
+  padding:7px 10px;
+  border-radius:9px;
+  border:1px solid #bdb4a7;
+  background:white;
+  color:var(--ink);
+}
+.choice.correct{border-color:var(--good);background:#edf7ed}
+.choice.wrong{border-color:var(--bad);background:#fff0f0}
+.feedback{
+  min-height:24px;
+  font-size:15px;
+  margin-top:8px;
+}
+.good{color:var(--good);font-weight:700}
+.bad{color:var(--bad);font-weight:700}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+button{
+  border:0;border-radius:11px;padding:11px 16px;font-size:16px;cursor:pointer
+}
+button.primary{background:var(--accent);color:white}
+button.secondary{background:#ece6da;color:var(--ink)}
+button.warn{background:#f6e6df;color:#7f3f2d}
+button:disabled{opacity:.45;cursor:not-allowed}
+.vocab-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:10px;
+  margin-top:14px
+}
+.vocab-item{
+  position:relative;
+  min-height:84px;
+  padding:12px;
+  border:1px solid var(--line);
+  background:#fbf8f0;
+  border-radius:12px;
+}
+.vocab-word{font-size:18px;font-weight:700}
+.vocab-meta{font-size:13px;color:var(--muted);margin-top:8px;display:none}
+.vocab-item.open .vocab-meta{display:block}
+.vocab-actions{display:flex;gap:6px;margin-top:8px}
+.vocab-actions button{padding:6px 9px;font-size:13px}
+.tip{font-size:14px;color:var(--muted);margin-top:8px}
+.word-help{
+  display:none;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:0 0 16px;
+  padding:10px 12px;
+  border:1px solid #c9ddd6;
+  background:#f0f6f3;
+  border-radius:11px;
+}
+.word-help.open{display:flex}
+.word-help-en{font-size:18px;font-weight:800;color:var(--accent)}
+.word-help-ru{font-size:16px}
+.story-word{
+  cursor:pointer;
+  border-radius:5px;
+  padding:0 1px;
+  transition:background .12s ease,color .12s ease;
+}
+.story-word:hover{background:#edf3f0}
+.story-word.active{
+  background:#d9ebe5;
+  color:#174f4d;
+  box-shadow:0 0 0 2px #bcd9d0;
+}
+.golden-phrase.recall-fade{
+  opacity:0;
+  transform:translateY(-3px);
+  transition:
+    opacity 6s cubic-bezier(0.12, 0.78, 0.16, 1),
+    transform 6s cubic-bezier(0.12, 0.78, 0.16, 1);
+}
+.comprehension{
+  border-left:4px solid var(--accent2);
+  background:#fff8f3;
+  padding:14px 16px;
+  margin-top:18px;
+  border-radius:10px
+}
+.answer-list{display:grid;gap:9px;margin-top:10px}
+.answer-btn{
+  text-align:left;background:white;border:1px solid #d6cfc4;color:var(--ink)
+}
+.answer-btn.correct{background:#edf7ed;border-color:var(--good)}
+.answer-btn.wrong{background:#fff0f0;border-color:var(--bad)}
+.golden{
+  text-align:center;
+  padding:24px;
+  background:#f0f6f3;
+  border:1px solid #c9ddd6;
+  border-radius:14px;
+  margin-top:18px
+}
+.golden-label{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:800}
+.golden-phrase{
+  font-size:clamp(23px,3vw,34px);
+  line-height:1.35;
+  margin:12px auto;
+  max-width:760px;
+  transition:opacity .5s ease
+}
+.golden-phrase.fading{opacity:.18}
+.speech-box{
+  margin-top:16px;
+  padding:14px;
+  border-radius:12px;
+  background:white;
+  border:1px dashed #b7c9c5
+}
+.heard{font-size:17px;min-height:26px;margin-top:8px}
+.hint{font-size:16px;color:#5f5f5f;margin-top:8px}
+.mic-state{font-size:13px;color:var(--muted);margin-top:6px}
+.finish{
+  text-align:center;padding:36px 20px
+}
+.finish h2{font-size:34px;margin:0 0 8px}
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.pill{background:var(--chip);padding:6px 9px;border-radius:999px;font-size:13px}
+.small{font-size:13px;color:var(--muted)}
+
+.listening-shell{
+  background:var(--paper);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:22px;
+  box-shadow:0 10px 30px rgba(60,45,25,.08);
+  margin-bottom:18px;
+}
+.listening-head{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:flex-start;
+  flex-wrap:wrap;
+}
+.listen-part-card{
+  margin-top:18px;
+  padding:18px;
+  border:1px solid #c9ddd6;
+  border-radius:14px;
+  background:#f7fbf9;
+}
+.listen-part-title{
+  font-weight:800;
+  font-size:20px;
+}
+.listen-instruction{
+  color:var(--muted);
+  font-size:14px;
+  margin-top:4px;
+}
+.word-pool-wrap{
+  margin-top:16px;
+  padding:14px;
+  border-radius:12px;
+  background:#fff8e8;
+  border:1px solid #eadfb9;
+}
+.word-pool,.word-slots{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin-top:10px;
+}
+.pool-word,.word-slot{
+  min-height:38px;
+  padding:8px 11px;
+  border-radius:9px;
+  border:1px solid #cfc3a7;
+  background:white;
+  color:var(--ink);
+  font-size:15px;
+}
+.pool-word:disabled{
+  opacity:.28;
+}
+.word-slot{
+  min-width:66px;
+  border-style:dashed;
+  background:#fffdf7;
+}
+.manual-listen-box{
+  margin-top:16px;
+  padding:14px;
+  border-radius:12px;
+  background:white;
+  border:1px dashed #9fbdb4;
+}
+.listen-heard{
+  min-height:34px;
+  margin-top:10px;
+  font-size:17px;
+  line-height:1.45;
+}
+.listen-status{
+  min-height:24px;
+  margin-top:8px;
+}
+.listen-complete{
+  margin-top:16px;
+  padding:14px;
+  border-radius:12px;
+  background:#eef7ef;
+  border:1px solid #bfd6c2;
+  font-size:20px;
+  text-align:center;
+  font-weight:800;
+}
+.scene-skip{
+  margin-left:auto;
+}
+
+
+
+.listen-speed{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 4px;color:var(--muted);font-size:14px}
+.listen-speed input[type="range"]{width:220px}
+.listen-speed-value{min-width:44px;font-weight:700;color:var(--ink)}
+.listen-voice-label{margin-left:12px}
+.listen-voice-select{max-width:360px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font:inherit}
+
+.listen-phrase-nav{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:16px;
+}
+.listen-phrase-nav .progress-label{margin:0 !important}
+.listen-phrase-select{
+  max-width:390px;
+  min-width:230px;
+  padding:9px 12px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#fff;
+  color:var(--ink);
+  font:inherit;
+  cursor:pointer;
+}
+
+.menu-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:14px;
+  margin-top:18px;
+}
+.menu-scene{
+  border:1px solid var(--line);
+  background:#fbf8f0;
+  border-radius:14px;
+  padding:16px;
+}
+.menu-scene h3{margin:0 0 6px;font-size:20px}
+.menu-scene .small{min-height:36px}
+.menu-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.menu-actions button{flex:1;min-width:105px}
+
+@media (max-width:640px){
+  .app{padding:10px}
+  .card{padding:16px}
+  .story{font-size:18px}
+  .choice{font-size:16px;max-width:100%}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="title-wrap">
+      <h1>The Wrong Backpack</h1>
+      <div class="subtitle">Choose · read · listen · remember · speak</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label" id="progressLabel">Scene 1 of 6</div>
+      <div class="progress"><div id="progressFill"></div></div>
+    </div>
+  </div>
+
+  <section class="card" id="startCard">
+    <div class="scene-kicker">The Wrong Backpack</div>
+    <div class="scene-title">Choose a scene and activity</div>
+    <p>First enable the microphone once for this session. Then choose any scene and start with Reading or Listening.</p>
+    <div class="btn-row">
+      <button class="primary" id="startBtn">Enable microphone & open menu →</button>
+    </div>
+    <div class="small" id="startMicNote">Recognition works best in Chrome / Edge on HTTPS or localhost. If microphone access is unavailable, Reading still works and speaking steps can be skipped.</div>
+    <div class="small" id="ttsVoiceNote">Voice: loading English voices…</div>
+  </section>
+
+  <section class="card hidden" id="menuCard">
+    <div class="scene-kicker">Main menu</div>
+    <div class="scene-title">Choose your practice</div>
+    <div class="tip">You can return here at any time with “Back to menu”.</div>
+    <div class="menu-grid" id="menuGrid"></div>
+  </section>
+
+  <div id="stage"></div>
+
+  <section class="card finish hidden" id="finishCard">
+    <h2>Quest finished 🎉</h2>
+    <p>You read the whole story, solved the choices and recalled six useful phrases.</p>
+    <div class="btn-row" style="justify-content:center">
+      <button class="primary" id="restartBtn">Start again</button>
+    </div>
+  </section>
+</div>
+
+<script>
+const scenes = [
+{
+  id:1,
+  title:"The Busy Station",
+  vocab:[
+    ["station","вокзал"],["crowded","людный"],["carefully","осторожно"],["slowly","медленно"],
+    ["bench","скамейка"],["backpack","рюкзак"],["heavy","тяжёлый"],["nearby","рядом"]
+  ],
+  story:`
+    <div class="choice-line">Last Saturday, I
+      <select class="choice" data-answer="went"><option value="">choose</option><option>go</option><option>went</option><option>was going</option></select>
+      to the city by train.
+    </div>
+    <div class="choice-line">The station was crowded, and people were walking
+      <select class="choice" data-answer="quickly"><option value="">choose</option><option>quick</option><option>quickly</option><option>quicker</option></select>
+      in every direction.
+    </div>
+    <p>I walked slowly because my backpack was heavy.</p>
+    <p>Near the entrance, there was a small café with a few empty tables.</p>
+    <div class="choice-line">I
+      <select class="choice" data-answer="decided to"><option value="">choose</option><option>decide</option><option>decided to</option><option>was deciding</option></select>
+      sit down and relax for a few minutes.
+    </div>
+    <p>I put my backpack carefully under a bench near my table.</p>
+  `,
+  question:"Why did the narrator walk slowly?",
+  answers:["Because the station was empty.","Because the backpack was heavy.","Because the train was late."],
+  correct:1,
+  phrase:"I walked slowly because my backpack was heavy.",
+  accepted:["i walked slowly because my backpack was heavy"]
+},
+{
+  id:2,
+  title:"A Short Break",
+  vocab:[
+    ["quiet","тихий"],["comfortable","удобный"],["customer","посетитель"],["loudly","громко"],
+    ["quietly","тихо"],["order","заказывать"],["sandwich","сэндвич"],["waiter","официант"]
+  ],
+  story:`
+    <p>Inside the café, it was warm and comfortable.</p>
+    <div class="choice-line">There
+      <select class="choice" data-answer="were"><option value="">choose</option><option>was</option><option>were</option><option>are</option></select>
+      several customers near the window.
+    </div>
+    <p>Two boys were talking loudly, but an older woman was reading quietly.</p>
+    <div class="choice-line">A waiter
+      <select class="choice" data-answer="came"><option value="">choose</option><option>comes</option><option>came</option><option>was come</option></select>
+      to my table.
+    </div>
+    <p>I ordered a sandwich and some juice.</p>
+    <p>While I was waiting, I looked around carefully and checked the time.</p>
+    <p>My train was leaving in forty minutes, so I wasn't worried.</p>
+  `,
+  question:"What did the narrator order?",
+  answers:["A sandwich and some juice.","Fish and water.","A cake and some tea."],
+  correct:0,
+  phrase:"While I was waiting, I looked around carefully.",
+  accepted:["while i was waiting i looked around carefully"]
+},
+{
+  id:3,
+  title:"Time to Go",
+  vocab:[
+    ["suddenly","внезапно"],["notice","замечать"],["hurry","торопиться"],["pick up","поднимать, брать"],
+    ["similar","похожий"],["leave","уходить"],["quickly","быстро"],["platform","платформа"]
+  ],
+  story:`
+    <p>Suddenly, I noticed the time. My train was coming soon.</p>
+    <div class="choice-line">I
+      <select class="choice" data-answer="had to"><option value="">choose</option><option>have to</option><option>had to</option><option>having to</option></select>
+      leave quickly.
+    </div>
+    <p>I paid for my food, picked up a dark blue backpack from under the bench, and hurried outside.</p>
+    <div class="choice-line">While I
+      <select class="choice" data-answer="was walking"><option value="">choose</option><option>walked</option><option>was walking</option><option>am walking</option></select>
+      to the platform, I thought the backpack felt a little strange.
+    </div>
+    <p>It looked almost exactly like mine, so I didn't stop.</p>
+    <p>I walked quickly through the station and got on the train.</p>
+  `,
+  question:"Why did the narrator leave the café quickly?",
+  answers:["The café was closing.","The train was coming soon.","The waiter asked him to leave."],
+  correct:1,
+  phrase:"I had to leave quickly because my train was coming soon.",
+  accepted:["i had to leave quickly because my train was coming soon"]
+},
+{
+  id:4,
+  title:"Something Is Wrong",
+  vocab:[
+    ["strange","странный"],["zipper","молния"],["carefully","осторожно"],["inside","внутри"],
+    ["scarf","шарф"],["notebook","тетрадь"],["realize","понимать, осознавать"],["wrong","не тот, неправильный"]
+  ],
+  story:`
+    <p>I found a seat by the window and put the backpack on my knees.</p>
+    <p>It still felt strange, so I opened it carefully.</p>
+    <div class="choice-line">There
+      <select class="choice" data-answer="was"><option value="">choose</option><option>were</option><option>was</option><option>is</option></select>
+      a red scarf inside.
+    </div>
+    <p>There were also two notebooks and a small camera.</p>
+    <div class="choice-line">I
+      <select class="choice" data-answer="couldn't"><option value="">choose</option><option>can't</option><option>couldn't</option><option>don't</option></select>
+      understand what had happened at first.
+    </div>
+    <p>Then I suddenly realized: this wasn't my backpack.</p>
+    <p>I checked everything carefully, but my phone charger and book were not there.</p>
+  `,
+  question:"What made the narrator realize it was the wrong backpack?",
+  answers:["It was too small.","There were unfamiliar things inside.","The zipper was broken."],
+  correct:1,
+  phrase:"Then I suddenly realized this wasn't my backpack.",
+  accepted:["then i suddenly realized this wasnt my backpack","then i suddenly realized this wasn't my backpack"]
+},
+{
+  id:5,
+  title:"Back to the Café",
+  vocab:[
+    ["return","возвращаться"],["nervous","взволнованный"],["politely","вежливо"],["explain","объяснять"],
+    ["manager","менеджер"],["remember","помнить"],["behind","за"],["finally","наконец"]
+  ],
+  story:`
+    <p>I got off the train at the next station and returned as quickly as I could.</p>
+    <p>I was tired and a little nervous, but I tried to speak calmly.</p>
+    <div class="choice-line">When I arrived, I
+      <select class="choice" data-answer="asked"><option value="">choose</option><option>ask</option><option>asked</option><option>was asking</option></select>
+      the waiter politely about my backpack.
+    </div>
+    <p>He listened carefully and called the manager.</p>
+    <div class="choice-line">The manager
+      <select class="choice" data-answer="remembered"><option value="">choose</option><option>remember</option><option>remembered</option><option>was remember</option></select>
+      another customer with a similar blue backpack.
+    </div>
+    <p>Then the waiter smiled and pointed behind the counter.</p>
+    <p>My backpack was there. I finally felt relaxed.</p>
+  `,
+  question:"Where was the narrator's backpack?",
+  answers:["On the train.","Behind the café counter.","Outside the station."],
+  correct:1,
+  phrase:"I asked the waiter politely about my backpack.",
+  accepted:["i asked the waiter politely about my backpack"]
+},
+{
+  id:6,
+  title:"The Other Backpack",
+  vocab:[
+    ["owner","владелец"],["mistake","ошибка"],["exactly","точно"],["laugh","смеяться"],
+    ["apologize","извиняться"],["carefully","осторожно"],["finally","наконец"],["label","ярлык, бирка"]
+  ],
+  story:`
+    <p>A few minutes later, a woman came into the café quickly.</p>
+    <p>She was carrying my backpack and looked very embarrassed.</p>
+    <div class="choice-line">She
+      <select class="choice" data-answer="had taken"><option value="">choose</option><option>takes</option><option>had taken</option><option>was take</option></select>
+      my backpack by mistake.
+    </div>
+    <p>Our backpacks looked almost exactly the same.</p>
+    <p>We both laughed, apologized, and exchanged them.</p>
+    <div class="choice-line">Before I left, I
+      <select class="choice" data-answer="put"><option value="">choose</option><option>put</option><option>puts</option><option>was putting</option></select>
+      a bright label on my backpack.
+    </div>
+    <p>After that, I checked it carefully every time I picked it up.</p>
+    <p>Finally, I caught the next train and went home.</p>
+  `,
+  question:"Why did the two people take the wrong backpacks?",
+  answers:["The backpacks looked almost the same.","They wanted new backpacks.","The waiter moved the bags."],
+  correct:0,
+  phrase:"Our backpacks looked almost exactly the same.",
+  accepted:["our backpacks looked almost exactly the same"]
+}
+];
+
+const LISTENING_SCENES = [
+  [
+    "Last Saturday, I went to the city by train.",
+    "The station was crowded.",
+    "People were walking quickly.",
+    "I walked slowly because my backpack was heavy.",
+    "There was a small café nearby.",
+    "I decided to sit down and relax.",
+    "I put my backpack carefully under a bench."
+  ],
+  [
+    "The café was warm and comfortable.",
+    "There were several customers near the window.",
+    "Two boys were talking loudly.",
+    "An older woman was reading quietly.",
+    "A waiter came to my table.",
+    "I ordered a sandwich and some juice.",
+    "I looked around carefully while I was waiting."
+  ],
+  [
+    "Suddenly, I noticed the time.",
+    "My train was coming soon.",
+    "I had to leave quickly.",
+    "I picked up a dark blue backpack.",
+    "I hurried outside.",
+    "The backpack felt a little strange.",
+    "I walked quickly to the platform."
+  ],
+  [
+    "I found a seat by the window.",
+    "I opened the backpack carefully.",
+    "There was a red scarf inside.",
+    "There were two notebooks and a camera.",
+    "I couldn't understand what had happened.",
+    "Then I suddenly realized the mistake.",
+    "This wasn't my backpack."
+  ],
+  [
+    "I returned as quickly as I could.",
+    "I was tired and a little nervous.",
+    "I tried to speak calmly.",
+    "I asked the waiter politely about my backpack.",
+    "He listened carefully.",
+    "The waiter pointed behind the counter.",
+    "I finally felt relaxed."
+  ],
+  [
+    "A woman came into the café quickly.",
+    "She was carrying my backpack.",
+    "She looked very embarrassed.",
+    "Our backpacks looked almost exactly the same.",
+    "We both laughed and apologized.",
+    "I put a bright label on my backpack.",
+    "Finally, I caught the next train."
+  ]
+];
+
+let listeningSceneIndex = 0;
+let listeningSentenceIndex = 0;
+let listeningPartIndex = 0;
+let listeningAttempts = 0;
+
+let listeningRecognition = null;
+let listeningCaptureActive = false;
+let listeningFinishRequested = false;
+let listeningFinalBuffer = "";
+let listeningInterimBuffer = "";
+let listeningRestartTimer = null;
+let listeningEvaluationDone = false;
+
+let poolWords = [];
+let slotWords = [];
+
+const WORD_TRANSLATIONS = {
+"a":"неопределённый артикль","about":"о / около","across":"через / поперёк","after":"после","afternoon":"день / после полудня",
+"again":"снова","also":"также","am":"есть / являюсь","and":"и","another":"другой / ещё один","apologized":"извинился",
+"are":"есть / являются","around":"вокруг","ask":"спрашивать / просить","asked":"спросил / попросил","at":"у / в / на",
+"ate":"ел / съел","back":"назад","be":"быть","because":"потому что","before":"до / перед","behind":"позади / за",
+"bit":"немного / кусочек","broken":"сломанный","brought":"принёс / был принесён","busier":"более оживлённый","busy":"занятый / оживлённый",
+"but":"но","café":"кафе","came":"пришёл","can":"мочь","carefully":"осторожно","centre":"центр","chairs":"стулья",
+"children":"дети","chips":"картофель фри","city":"город","clearly":"ясно / чётко","code":"код / пароль",
+"comfortable":"удобный","connected":"подключился","could":"мог / мог бы","counter":"стойка","crossed":"перешёл",
+"customer":"клиент / посетитель","customers":"клиенты / посетители","days":"дни","did":"делал; вспомогательный did",
+"didn't":"не сделал / не","do":"делать; вспомогательный do","down":"вниз","eat":"есть","eating":"едящий / процесс еды",
+"embarrassed":"смущённый","empty":"пустой / свободный","england":"Англия","enough":"достаточно","everything":"всё",
+"excuse":"извините (в Excuse me)","expected":"ожидал","feel":"чувствовать","few":"несколько / немного",
+"finally":"наконец","finished":"закончил","first":"первый / сначала","fish":"рыба","food":"еда","for":"для / за / в течение",
+"forget":"забыть","free":"бесплатный / свободный","friends":"друзья","get":"получать","give":"давать","go":"идти / ехать",
+"going":"идущий; в going to — собираться","good":"хороший","great":"отлично / отличный","group":"группа","had":"имел; had to — пришлось",
+"have":"иметь; have to — нужно","he":"он","help":"помогать","here":"здесь","him":"ему / его","hometown":"родной город",
+"hotter":"горячее","hours":"часы","hungry":"голодный","i":"я","i'll":"я буду / я сделаю","if":"если","in":"в",
+"inside":"внутри","interesting":"интересный","irritated":"раздражённый","is":"есть / является","it":"это / оно",
+"joking":"шутит / шутящий","large":"большой","last":"прошлый / последний","later":"позже","laugh":"смеяться",
+"letters":"буквы","liverpool":"Ливерпуль","look":"смотреть / выглядеть","looked":"посмотрел / выглядел","looks":"выглядит",
+"lot":"много (a lot)","loudly":"громко","manager":"менеджер / управляющий","maybe":"может быть","me":"мне / меня",
+"meal":"еда / приём пищи","minute":"минута","minutes":"минуты","misunderstanding":"недопонимание","moment":"момент",
+"more":"более / больше","musicians":"музыканты","my":"мой","myself":"самому себе","near":"рядом / около","never":"никогда",
+"next":"следующий / соседний","nicer":"приятнее / лучше","not":"не","noticed":"заметил","now":"сейчас","of":"из / от / родительный смысл",
+"okay":"хорошо","on":"на","one":"один","ones":"те / те самые","order":"заказ / заказывать","ordered":"заказал",
+"outside":"снаружи","parents":"родители","people":"люди","phone":"телефон","pictures":"фотографии","playing":"играют / играющий",
+"please":"пожалуйста","politely":"вежливо","probably":"вероятно","problem":"проблема","quickly":"быстро","quiet":"тихий",
+"quieter":"тише","quietly":"тихо","quite":"довольно","ready":"готов","really":"действительно / очень","relax":"расслабиться",
+"reserved":"зарезервирован","restaurant":"ресторан","road":"дорога","said":"сказал","same":"тот же / одинаковый","screen":"экран",
+"see":"видеть","send":"отправлять","served":"подан / обслужен","sign":"табличка / знак","sitting":"сидящий / сидят",
+"slowly":"медленно","small":"маленький","smile":"улыбка / улыбаться","smiled":"улыбнулся","so":"поэтому / так",
+"solved":"решён","some":"несколько / некоторые","something":"что-то","soon":"скоро","speaking":"говорящий / говорят",
+"square":"площадь","started":"начал","stayed":"оставался / жил","stood":"встал / стоял","streets":"улицы","suddenly":"внезапно",
+"summer":"лето","table":"стол / столик","tables":"столы / столики","taking":"берущий; taking pictures — фотографируя",
+"talk":"говорить / разговаривать","talking":"разговаривает / разговаривающий","tell":"сказать / сообщить","than":"чем",
+"the":"определённый артикль","their":"их","them":"их / им","then":"затем / тогда","there":"там; в there is/are — конструкция «есть»",
+"they":"они","thing":"вещь","think":"думать","this":"это / этот","thought":"подумал","time":"время / раз","tired":"уставший",
+"to":"к / чтобы / частица перед глаголом","told":"сказал / велел","took":"взял","tourists":"туристы","trying":"пытается / пытающийся",
+"twenty":"двадцать","two":"два","understand":"понимать","up":"вверх","very":"очень","visited":"посетил",
+"wait":"ждать","waiter":"официант","waiting":"ждущий / ожидание","walked":"шёл / гулял","walking":"идущий / гуляющий",
+"wall":"стена","wanted":"хотел","warm":"тёплый","was":"был / была / было","weather":"погода","went":"пошёл / пошла",
+"were":"были","while":"пока / в то время как","will":"будет / вспомогательное будущее","window":"окно","with":"с / вместе с",
+"written":"написан","yes":"да","you":"ты / вы","your":"твой / ваш","wi-fi":"Wi-Fi / беспроводной интернет",
+"wifi":"Wi-Fi / беспроводной интернет",
+  "station":"вокзал",
+  "crowded":"людный",
+  "bench":"скамейка",
+  "backpack":"рюкзак",
+  "heavy":"тяжёлый",
+  "nearby":"рядом",
+  "sandwich":"сэндвич",
+  "notice":"замечать",
+  "hurry":"торопиться",
+  "pick":"брать",
+  "picked":"взял",
+  "similar":"похожий",
+  "leave":"уходить",
+  "platform":"платформа",
+  "strange":"странный",
+  "zipper":"молния",
+  "scarf":"шарф",
+  "notebook":"тетрадь",
+  "notebooks":"тетради",
+  "realize":"понимать",
+  "realized":"понял",
+  "wrong":"не тот, неправильный",
+  "return":"возвращаться",
+  "returned":"вернулся",
+  "nervous":"взволнованный",
+  "explain":"объяснять",
+  "remember":"помнить",
+  "remembered":"вспомнил",
+  "owner":"владелец",
+  "mistake":"ошибка",
+  "exactly":"точно",
+  "laughed":"засмеялись",
+  "apologize":"извиняться",
+  "label":"ярлык, бирка",
+  "camera":"камера",
+  "charger":"зарядное устройство",
+  "calmly":"спокойно",
+  "direction":"направление",
+  "entrance":"вход",
+  "juice":"сок",
+  "knees":"колени",
+  "exchanged":"обменяли",
+  "bright":"яркий",
+  "caught":"успел на, поймал",
+  "train":"поезд",
+  "seat":"место"
+};
+
+const WORD_PRONUNCIATIONS = {
+  "a": "э",
+  "about": "эба́ут",
+  "across": "экро́с",
+  "after": "а́фтэр",
+  "afternoon": "эфтёрнун",
+  "again": "эгэ́н",
+  "also": "олсоу",
+  "am": "эм",
+  "and": "энд",
+  "another": "аназёр",
+  "apologized": "эпо́лэджайзд",
+  "are": "ар",
+  "around": "эра́унд",
+  "ask": "эск",
+  "asked": "эскт",
+  "at": "эт",
+  "ate": "эйт",
+  "back": "бэк",
+  "be": "би",
+  "because": "бико́з",
+  "before": "бифо́р",
+  "behind": "биха́йнд",
+  "bit": "бит",
+  "broken": "бро́укэн",
+  "brought": "брот",
+  "busier": "бизиёр",
+  "busy": "бизи",
+  "but": "бат",
+  "café": "кафэ́",
+  "came": "кэйм",
+  "can": "кэн",
+  "carefully": "кэ́афэли",
+  "centre": "сэнтёр",
+  "chairs": "чэрз",
+  "children": "чи́лдрэн",
+  "chips": "чипс",
+  "city": "си́ти",
+  "clearly": "кли́эрли",
+  "code": "коуд",
+  "comfortable": "ка́мфтэбл",
+  "connected": "канэктид",
+  "could": "куд",
+  "counter": "ка́унтэр",
+  "crossed": "крост",
+  "customer": "ка́стэмэр",
+  "customers": "ка́стэмэрз",
+  "days": "дэйз",
+  "did": "дид",
+  "didn\"t": "дидант",
+  "do": "ду",
+  "down": "даун",
+  "eat": "ит",
+  "eating": "итинг",
+  "embarrassed": "имбэ́рэст",
+  "empty": "эмпти",
+  "england": "инггланд",
+  "enough": "ина́ф",
+  "everything": "э́врисинг",
+  "excuse": "икскью́з",
+  "expected": "икспэ́ктид",
+  "feel": "фил",
+  "few": "фйу",
+  "finally": "фа́йнэли",
+  "finished": "финишт",
+  "first": "фёрст",
+  "fish": "фиш",
+  "food": "фуд",
+  "for": "фор",
+  "forget": "фёргэт",
+  "free": "фри",
+  "friends": "фрэндз",
+  "get": "гэт",
+  "give": "гив",
+  "go": "гоу",
+  "going": "го́уинг",
+  "good": "гуд",
+  "great": "грэйт",
+  "group": "груп",
+  "had": "хэд",
+  "have": "хэв",
+  "he": "хи",
+  "help": "хэлп",
+  "here": "хир",
+  "him": "хим",
+  "hometown": "хоумтаун",
+  "hotter": "хатёр",
+  "hours": "ауёрз",
+  "hungry": "ха́нгри",
+  "i": "ай",
+  "i\"ll": "айл",
+  "if": "иф",
+  "in": "ин",
+  "inside": "инса́йд",
+  "interesting": "и́нтрэстинг",
+  "irritated": "и́ритэйтид",
+  "is": "из",
+  "it": "ит",
+  "joking": "джо́укинг",
+  "large": "лардж",
+  "last": "лэст",
+  "later": "лэйтёр",
+  "laugh": "лаф",
+  "letters": "лэтёрз",
+  "liverpool": "ли́вэрпул",
+  "look": "лук",
+  "looked": "лукт",
+  "looks": "лукс",
+  "lot": "лат",
+  "loudly": "ла́удли",
+  "manager": "мэ́ниджэр",
+  "maybe": "мэ́йби",
+  "me": "ми",
+  "meal": "мил",
+  "minute": "ми́нит",
+  "minutes": "минатс",
+  "misunderstanding": "мисандэрстэ́ндинг",
+  "moment": "моумант",
+  "more": "мор",
+  "musicians": "мьюзи́шэнз",
+  "my": "май",
+  "myself": "майсэлф",
+  "near": "нир",
+  "never": "нэвёр",
+  "next": "нэкст",
+  "nicer": "найсёр",
+  "not": "нат",
+  "noticed": "но́утист",
+  "now": "нау",
+  "of": "ов",
+  "okay": "оукэй",
+  "on": "ан",
+  "one": "уан",
+  "ones": "уанз",
+  "order": "о́рдэр",
+  "ordered": "ордёрд",
+  "outside": "аутса́йд",
+  "parents": "пэ́рэнтс",
+  "people": "пи́пл",
+  "phone": "фоун",
+  "pictures": "пи́кчерз",
+  "playing": "плэйинг",
+  "please": "плиз",
+  "politely": "пэла́йтли",
+  "probably": "про́бэбли",
+  "problem": "праблам",
+  "quickly": "кви́кли",
+  "quiet": "ква́йэт",
+  "quieter": "куайатёр",
+  "quietly": "ква́йэтли",
+  "quite": "куайт",
+  "ready": "рэ́ди",
+  "really": "рили",
+  "relax": "рилэ́кс",
+  "reserved": "ризёрвд",
+  "restaurant": "рэ́стэронт",
+  "road": "роуд",
+  "said": "сэд",
+  "same": "сэйм",
+  "screen": "скрин",
+  "see": "си",
+  "send": "сэнд",
+  "served": "сёрвд",
+  "sign": "сайн",
+  "sitting": "ситинг",
+  "slowly": "сло́ули",
+  "small": "смол",
+  "smile": "смайл",
+  "smiled": "смайлд",
+  "so": "соу",
+  "solved": "салвд",
+  "some": "сам",
+  "something": "са́мсинг",
+  "soon": "сун",
+  "speaking": "спи́кинг",
+  "square": "скуэр",
+  "started": "ста́ртид",
+  "stayed": "стэйд",
+  "stood": "студ",
+  "streets": "стритс",
+  "suddenly": "са́дэнли",
+  "summer": "самёр",
+  "table": "тэйбал",
+  "tables": "тэйбалз",
+  "taking": "тэ́йкинг",
+  "talk": "ток",
+  "talking": "то́кинг",
+  "tell": "тэл",
+  "than": "зэн",
+  "the": "зэ",
+  "their": "зэр",
+  "them": "зэм",
+  "then": "зэн",
+  "there": "зэр",
+  "they": "зэй",
+  "thing": "синг",
+  "think": "сингк",
+  "this": "зис",
+  "thought": "сот",
+  "time": "тайм",
+  "tired": "та́йэрд",
+  "to": "ту",
+  "told": "тоулд",
+  "took": "тук",
+  "tourists": "ту́ристс",
+  "trying": "тра́йинг",
+  "twenty": "туэ́нти",
+  "two": "ту",
+  "understand": "андэрстэ́нд",
+  "up": "ап",
+  "very": "вэри",
+  "visited": "ви́зитид",
+  "wait": "уэйт",
+  "waiter": "уэ́йтэр",
+  "waiting": "уэ́йтинг",
+  "walked": "уокт",
+  "walking": "уо́кинг",
+  "wall": "уол",
+  "wanted": "уо́нтид",
+  "warm": "уорм",
+  "was": "уаз",
+  "weather": "уэ́зэр",
+  "went": "уэнт",
+  "were": "уёр",
+  "while": "уайл",
+  "will": "уил",
+  "window": "уи́ндоу",
+  "with": "уиз",
+  "written": "ри́тэн",
+  "yes": "йэс",
+  "you": "йу",
+  "your": "йор",
+  "wi-fi": "уай-фай",
+  "wifi": "уай-фай",
+  "didn't": "дидант",
+  "i'll": "айл",
+  "station": "стэ́йшн",
+  "crowded": "кра́удид",
+  "bench": "бэнч",
+  "backpack": "бэ́кпэк",
+  "heavy": "хэ́ви",
+  "nearby": "ниэба́й",
+  "sandwich": "сэ́ндуич",
+  "notice": "но́утис",
+  "hurry": "ха́ри",
+  "pick": "пик",
+  "picked": "пикт",
+  "similar": "си́милэр",
+  "leave": "лив",
+  "platform": "плэ́тформ",
+  "strange": "стрэйндж",
+  "zipper": "зи́пэр",
+  "scarf": "скаф",
+  "notebook": "но́утбук",
+  "notebooks": "но́утбукс",
+  "realize": "ри́элайз",
+  "realized": "ри́элайзд",
+  "wrong": "ронг",
+  "return": "ритёрн",
+  "returned": "ритёрнд",
+  "nervous": "нё́рвэс",
+  "explain": "иксплэ́йн",
+  "remember": "римэ́мбэр",
+  "remembered": "римэ́мбэрд",
+  "owner": "о́унэр",
+  "mistake": "мистэ́йк",
+  "exactly": "игзэ́ктли",
+  "laughed": "лафт",
+  "apologize": "эпо́лэджайз",
+  "label": "лэ́йбэл",
+  "camera": "кэ́мэра",
+  "charger": "ча́рджэр",
+  "calmly": "ка́мли",
+  "direction": "дирэ́кшн",
+  "entrance": "э́нтрэнс",
+  "juice": "джус",
+  "knees": "низ",
+  "exchanged": "иксчэ́йнджд",
+  "bright": "брайт",
+  "caught": "кот",
+  "train": "трэйн",
+  "seat": "сит"
+};
+
+const IRREGULAR_TRANSLATION_KEYS = {
+  "broke":"broken","bring":"brought","gave":"give","gives":"give","hottest":"hotter","hot":"hotter",
+  "joked":"joking","jokes":"joking","louder":"loudly","loud":"loudly","quieter":"quiet","sat":"sitting",
+  "says":"said","serve":"served","solve":"solved","talked":"talk","wrote":"written","write":"written"
+};
+
+let sceneIndex = 0;
+let currentAttempts = 0;
+let recognition = null;
+let microphonePrimed = false;
+let activeSpeechScene = null;
+let activeSpeechAlternatives = [];
+
+let goldenRecognition = null;
+let goldenCaptureActive = false;
+let goldenFinishRequested = false;
+let goldenFinalBuffer = "";
+let goldenInterimBuffer = "";
+let goldenRestartTimer = null;
+let goldenEvaluationDone = false;
+let goldenTargetScene = null;
+let goldenRetryTimer = null;
+
+
+const stage = document.getElementById("stage");
+const startCard = document.getElementById("startCard");
+const menuCard = document.getElementById("menuCard");
+const finishCard = document.getElementById("finishCard");
+const progressLabel = document.getElementById("progressLabel");
+const progressFill = document.getElementById("progressFill");
+
+document.getElementById("startBtn").addEventListener("click", async ()=> {
+  const btn = document.getElementById("startBtn");
+  const note = document.getElementById("startMicNote");
+  btn.disabled = true;
+  btn.textContent = "Preparing microphone…";
+
+  if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+    try{
+      keepAliveMicStream = await navigator.mediaDevices.getUserMedia({audio:true});
+      microphonePrimed = true;
+      note.textContent = "Microphone permission granted for this session. Keep this page open while you work.";
+    }catch(err){
+      microphonePrimed = false;
+      note.textContent = "Microphone permission was not granted. Reading still works; speaking can be skipped.";
+    }
+  }else{
+    note.textContent = "This browser/page cannot request microphone permission in advance. Reading still works.";
+  }
+
+  await waitForVoices();
+  initRecognitionOnce();
+  startCard.classList.add("hidden");
+  openMainMenu();
+});
+document.getElementById("restartBtn").addEventListener("click",()=> {
+  finishCard.classList.add("hidden");
+  openMainMenu();
+});
+
+
+function stopAllActivity(){
+  try{ recognition?.abort?.(); }catch(e){}
+  stopListeningCapture(true);
+  stopGoldenCapture(true);
+  if("speechSynthesis" in window) speechSynthesis.cancel();
+}
+
+function openMainMenu(){
+  stopAllActivity();
+  startCard.classList.add("hidden");
+  finishCard.classList.add("hidden");
+  stage.innerHTML="";
+  menuCard.classList.remove("hidden");
+  progressLabel.textContent="Choose a scene";
+  progressFill.style.width="0%";
+  renderMainMenu();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function renderMainMenu(){
+  const grid=document.getElementById("menuGrid");
+  if(!grid) return;
+  grid.innerHTML=scenes.map((scene,i)=>`
+    <div class="menu-scene">
+      <div class="scene-kicker">Scene ${i+1}</div>
+      <h3>${scene.title}</h3>
+      <div class="small">Choose how you want to practise this scene.</div>
+      <div class="menu-actions">
+        <button class="primary" data-menu-reading="${i}">📖 Reading</button>
+        <button class="secondary" data-menu-listening="${i}">🎧 Listening</button>
+      </div>
+    </div>
+  `).join("");
+
+  grid.querySelectorAll("[data-menu-reading]").forEach(btn=>{
+    btn.onclick=()=>{
+      menuCard.classList.add("hidden");
+      sceneIndex=Number(btn.dataset.menuReading);
+      renderScene();
+    };
+  });
+
+  grid.querySelectorAll("[data-menu-listening]").forEach(btn=>{
+    btn.onclick=()=>{
+      menuCard.classList.add("hidden");
+      openListeningMode(Number(btn.dataset.menuListening));
+    };
+  });
+}
+
+function updateProgress(){
+  const pct = (sceneIndex / scenes.length) * 100;
+  progressFill.style.width = pct + "%";
+  progressLabel.textContent = sceneIndex < scenes.length ? `Scene ${sceneIndex+1} of ${scenes.length}` : "Finished";
+}
+
+let englishVoices = [];
+let preferredVoice = null;
+let voiceLoadPromise = null;
+let keepAliveMicStream = null;
+let listeningVoicePool = [];
+let currentListeningVoice = null;
+let listeningSpeechRate = 0.70;
+
+function choosePreferredVoice(voices){
+  const english = voices.filter(v => /^en(?:-|_)/i.test(v.lang || "") || /English/i.test(v.name || ""));
+  englishVoices = english;
+
+  // "Classic gentleman" preference order.
+  // On Windows, Microsoft David is usually the familiar classic male English voice.
+  const priorities = [
+    /Microsoft David/i,
+    /Microsoft Mark/i,
+    /Microsoft Guy/i,
+    /Daniel/i,
+    /Google UK English Male/i,
+    /Alex/i,
+    /David/i,
+    /Mark/i,
+    /Guy/i
+  ];
+
+  for(const rx of priorities){
+    const found = english.find(v => rx.test(v.name || ""));
+    if(found){
+      preferredVoice = found;
+      return found;
+    }
+  }
+
+  // Prefer an English male-like/system voice if the name gives us a clue.
+  const maleLike = english.find(v => /male|man/i.test(v.name || ""));
+  if(maleLike){
+    preferredVoice = maleLike;
+    return maleLike;
+  }
+
+  preferredVoice = english[0] || voices[0] || null;
+  return preferredVoice;
+}
+
+
+function buildListeningVoicePool(voices){
+  const english=voices.filter(v =>
+    /^en(?:-|_)/i.test(v.lang || "") ||
+    /English/i.test(v.name || "")
+  );
+
+  const picked=[];
+  const add=v=>{
+    if(v && !picked.includes(v) && picked.length<6) picked.push(v);
+  };
+
+  // 1) Our two tested favourites, when this computer provides them.
+  add(english.find(v=>/Microsoft Mark/i.test(v.name || "") && /^en-US/i.test(v.lang || "")));
+  add(english.find(v=>/Google US English/i.test(v.name || "") && /^en-US/i.test(v.lang || "")));
+
+  // 2) Fill with other real US English voices.
+  // David is deliberately kept for the end because it was less clear in class.
+  const usVoices=english.filter(v=>/^en-US/i.test(v.lang || ""));
+  for(const v of usVoices){
+    if(picked.length>=6) break;
+    if(/Microsoft Mark/i.test(v.name || "")) continue;
+    if(/Google US English/i.test(v.name || "")) continue;
+    if(/Microsoft David/i.test(v.name || "")) continue;
+    add(v);
+  }
+
+  // 3) If fewer than six US voices exist, use other available English voices.
+  for(const v of english){
+    if(picked.length>=6) break;
+    if(/^en-US/i.test(v.lang || "")) continue;
+    add(v);
+  }
+
+  // 4) David is a final fallback only if we still have an empty place.
+  if(picked.length<6){
+    add(english.find(v=>/Microsoft David/i.test(v.name || "") && /^en-US/i.test(v.lang || "")));
+  }
+
+  // 5) Last-resort fill from any remaining English voice.
+  for(const v of english){
+    if(picked.length>=6) break;
+    add(v);
+  }
+
+  listeningVoicePool=picked.slice(0,6);
+
+  // Keep a manually selected voice if it is still available.
+  // On first load prefer Google US English.
+  if(!listeningVoicePool.includes(currentListeningVoice)){
+    currentListeningVoice =
+      listeningVoicePool.find(v=>/Google US English/i.test(v.name || "") && /^en-US/i.test(v.lang || "")) ||
+      listeningVoicePool[0] ||
+      preferredVoice ||
+      null;
+  }
+}
+function chooseRandomListeningVoice(){
+  if(!listeningVoicePool.length) buildListeningVoicePool(window.speechSynthesis?.getVoices?.() || []);
+
+  // Keep the same voice until the player changes it manually.
+  if(currentListeningVoice && listeningVoicePool.includes(currentListeningVoice)){
+    return currentListeningVoice;
+  }
+
+  currentListeningVoice =
+    listeningVoicePool.find(v=>/Google US English/i.test(v.name || "") && /^en-US/i.test(v.lang || "")) ||
+    listeningVoicePool[0] ||
+    preferredVoice ||
+    null;
+  return currentListeningVoice;
+}
+
+function refreshVoices(){
+  if(!("speechSynthesis" in window)) return [];
+  const voices = window.speechSynthesis.getVoices() || [];
+  choosePreferredVoice(voices);
+  buildListeningVoicePool(voices);
+
+  const note = document.getElementById("ttsVoiceNote");
+  if(note){
+    note.textContent = preferredVoice
+      ? `Voice: ${preferredVoice.name} (${preferredVoice.lang})`
+      : "Voice: no system voice found yet";
+  }
+  return voices;
+}
+
+function waitForVoices(timeoutMs = 2500){
+  if(voiceLoadPromise) return voiceLoadPromise;
+
+  voiceLoadPromise = new Promise(resolve => {
+    const now = refreshVoices();
+    if(now.length){
+      resolve(now);
+      return;
+    }
+
+    let finished = false;
+    const finish = ()=>{
+      if(finished) return;
+      finished = true;
+      const voices = refreshVoices();
+      resolve(voices);
+    };
+
+    if("speechSynthesis" in window && "onvoiceschanged" in window.speechSynthesis){
+      const previous = window.speechSynthesis.onvoiceschanged;
+      window.speechSynthesis.onvoiceschanged = ()=>{
+        if(typeof previous === "function"){
+          try{ previous(); }catch(e){}
+        }
+        finish();
+      };
+    }
+
+    setTimeout(finish, timeoutMs);
+  });
+
+  return voiceLoadPromise;
+}
+
+function normalizeListening(s){
+  return (s||"")
+    .toLowerCase()
+    .replace(/i[’']m/g,"i am")
+    .replace(/[’']/g,"")
+    .replace(/wi[\s-]?fi/g,"wifi")
+    .replace(/\b0\b/g,"zero")
+    .replace(/\b1\b/g,"one")
+    .replace(/\b2\b/g,"two")
+    .replace(/\b3\b/g,"three")
+    .replace(/\b4\b/g,"four")
+    .replace(/\b5\b/g,"five")
+    .replace(/\b6\b/g,"six")
+    .replace(/\b7\b/g,"seven")
+    .replace(/\b8\b/g,"eight")
+    .replace(/\b9\b/g,"nine")
+    .replace(/\b10\b/g,"ten")
+    .replace(/\b11\b/g,"eleven")
+    .replace(/\b12\b/g,"twelve")
+    .replace(/\b13\b/g,"thirteen")
+    .replace(/\b14\b/g,"fourteen")
+    .replace(/\b15\b/g,"fifteen")
+    .replace(/\b16\b/g,"sixteen")
+    .replace(/\b17\b/g,"seventeen")
+    .replace(/\b18\b/g,"eighteen")
+    .replace(/\b19\b/g,"nineteen")
+    .replace(/\b20\b/g,"twenty")
+    .replace(/[.,!?;:"]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function listeningSimilarity(a,b){
+  const aa=normalizeListening(a);
+  const bb=normalizeListening(b);
+  if(!aa || !bb) return 0;
+  if(aa===bb) return 1;
+
+  const aw=aa.split(" ");
+  const bw=bb.split(" ");
+  const aset=new Set(aw);
+  const bset=new Set(bw);
+  let hit=0;
+  aset.forEach(w=>{if(bset.has(w)) hit++;});
+  const wordScore=hit/Math.max(1,new Set([...aset,...bset]).size);
+
+  const longest=Math.max(aa.length,bb.length);
+  let same=0;
+  const min=Math.min(aa.length,bb.length);
+  for(let i=0;i<min;i++){
+    if(aa[i]===bb[i]) same++;
+  }
+  const prefixScore=same/Math.max(1,longest);
+
+  return Math.max(wordScore,prefixScore);
+}
+
+function shuffleListening(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function openListeningMode(index){
+  try{ recognition?.abort?.(); }catch(e){}
+  if("speechSynthesis" in window) speechSynthesis.cancel();
+
+  listeningSceneIndex=index;
+  listeningSentenceIndex=0;
+  listeningPartIndex=0;
+  listeningAttempts=0;
+
+  startCard.classList.add("hidden");
+  menuCard.classList.add("hidden");
+  finishCard.classList.add("hidden");
+  renderListeningMode();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function renderListeningMode(){
+  const scene=scenes[listeningSceneIndex];
+  const rounds=LISTENING_SCENES[listeningSceneIndex];
+
+  progressLabel.textContent=`Listening · Scene ${listeningSceneIndex+1} of ${scenes.length}`;
+  progressFill.style.width=`${((listeningSceneIndex + (listeningSentenceIndex/Math.max(1,rounds.length)))/scenes.length)*100}%`;
+
+  stage.innerHTML=`
+    <section class="listening-shell">
+      <div class="listening-head">
+        <div>
+          <div class="scene-kicker">Listening · Scene ${listeningSceneIndex+1}</div>
+          <div class="scene-title">${scene.title}</div>
+          <div class="tip">Listen to one short phrase → build it from the word pool if useful → press Start speaking → say the whole phrase → press Finish.</div>
+        </div>
+        <div class="btn-row" style="margin-top:0">
+          <button class="secondary" id="backToMenuListeningBtn">← Back to menu</button>
+          <button class="secondary" id="backToReadingBtn">← Back to reading</button>
+          <button class="secondary" id="skipListeningSceneBtn">Skip listening scene →</button>
+        </div>
+      </div>
+
+      <div class="listen-phrase-nav">
+        <div class="progress-label" style="text-align:left">
+          Phrase ${listeningSentenceIndex+1} of ${rounds.length}
+        </div>
+        <select class="listen-phrase-select" id="listeningPhraseSelect" aria-label="Choose listening phrase">
+          ${rounds.map((phrase,i)=>{
+            const clean=phrase.replace(/[.!?]+$/,"").trim();
+            const words=clean.split(/\s+/);
+            const preview=words.slice(0,2).join(" ") + (words.length>2 ? "…" : "");
+            return `<option value="${i}" ${i===listeningSentenceIndex ? "selected" : ""}>${i+1} · ${preview}</option>`;
+          }).join("")}
+        </select>
+      </div>
+      <div class="progress"><div style="width:${((listeningSentenceIndex)/rounds.length)*100}%"></div></div>
+      <div class="listen-speed">
+        <span>Speech speed</span>
+        <input id="listeningSpeedSlider" type="range" min="0.25" max="1.30" step="0.05" value="${listeningSpeechRate}">
+        <span class="listen-speed-value" id="listeningSpeedValue">${listeningSpeechRate.toFixed(2)}×</span>
+        <span class="listen-voice-label">Voice</span>
+        <select id="listeningVoiceSelect" class="listen-voice-select" aria-label="Choose listening voice">
+          ${listeningVoicePool.map((voice,i)=>{
+            const selected=voice===currentListeningVoice ? "selected" : "";
+            return `<option value="${i}" ${selected}>${i+1} · ${voice.name} (${voice.lang || "English"})</option>`;
+          }).join("")}
+        </select>
+      </div>
+
+      <div id="listeningTaskHost"></div>
+    </section>
+  `;
+
+  document.getElementById("backToMenuListeningBtn").onclick=openMainMenu;
+
+  document.getElementById("backToReadingBtn").onclick=()=>{
+    stopListeningCapture(true);
+    sceneIndex=listeningSceneIndex;
+    renderScene();
+    document.getElementById("vocabCard")?.classList.add("hidden");
+    document.getElementById("storyCard")?.classList.remove("hidden");
+    window.scrollTo({top:0,behavior:"smooth"});
+  };
+
+  document.getElementById("skipListeningSceneBtn").onclick=()=>{
+    stopListeningCapture(true);
+    finishListeningScene();
+  };
+
+  document.getElementById("listeningPhraseSelect").onchange=e=>{
+    stopListeningCapture(true);
+    if("speechSynthesis" in window) speechSynthesis.cancel();
+    listeningSentenceIndex=Number(e.target.value);
+    listeningPartIndex=0;
+    renderListeningMode();
+  };
+
+  const speedSlider=document.getElementById("listeningSpeedSlider");
+  const speedValue=document.getElementById("listeningSpeedValue");
+  speedSlider.oninput=()=>{
+    listeningSpeechRate=Number(speedSlider.value);
+    speedValue.textContent=listeningSpeechRate.toFixed(2)+"×";
+  };
+
+  const voiceSelect=document.getElementById("listeningVoiceSelect");
+  if(voiceSelect){
+    voiceSelect.onchange=()=>{
+      const chosen=listeningVoicePool[Number(voiceSelect.value)];
+      if(chosen) currentListeningVoice=chosen;
+      if("speechSynthesis" in window) speechSynthesis.cancel();
+    };
+  }
+
+  renderListeningPart();
+}
+
+function renderListeningPart(){
+  const target=LISTENING_SCENES[listeningSceneIndex][listeningSentenceIndex];
+  const host=document.getElementById("listeningTaskHost");
+  if(!host) return;
+
+  listeningAttempts=0;
+  poolWords=[];
+  slotWords=[];
+  chooseRandomListeningVoice();
+
+  host.innerHTML=`
+    <div class="listen-part-card">
+      <div class="listen-part-title">Phrase ${listeningSentenceIndex+1}</div>
+      <div class="listen-instruction">The text is hidden. First listen to the phrase.</div>
+
+      <div class="btn-row">
+        <button class="secondary" id="listenPartBtn">🔊 Listen to phrase</button>
+        <button class="secondary" id="skipListeningPartBtn">Skip this phrase →</button>
+      </div>
+
+      <div class="word-pool-wrap hidden" id="wordPoolWrap">
+        <b>Build the phrase if you need help:</b>
+        <div class="word-slots" id="wordSlots"></div>
+        <div class="word-pool" id="wordPool"></div>
+        <div class="btn-row" style="justify-content:center">
+          <button class="secondary" id="resetWordPoolBtn">Reset words</button>
+        </div>
+        <div class="feedback" id="poolFeedback"></div>
+      </div>
+
+      <div class="manual-listen-box">
+        <b>🎤 Manual speaking window</b>
+        <div class="tip">Google listens only between your clicks. You may pause while speaking. Press Finish only when you have said the complete phrase.</div>
+        <div class="btn-row">
+          <button class="primary" id="startManualBtn" disabled>🎤 Start speaking</button>
+          <button class="secondary" id="finishManualBtn" disabled>■ Finish</button>
+        </div>
+        <div class="listen-heard" id="listeningHeard"></div>
+        <div class="listen-status" id="listeningStatus">Listen to the part first.</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("listenPartBtn").onclick=()=>playListeningPart(target);
+  document.getElementById("skipListeningPartBtn").onclick=()=>completeListeningPart(true);
+  document.getElementById("startManualBtn").onclick=startListeningCapture;
+  document.getElementById("finishManualBtn").onclick=()=>stopListeningCapture(false);
+  document.getElementById("resetWordPoolBtn").onclick=()=>buildWordPool(target);
+}
+
+async function playListeningPart(textToSpeak){
+  stopListeningCapture(true);
+
+  const status=document.getElementById("listeningStatus");
+  const listenBtn=document.getElementById("listenPartBtn");
+  const startBtn=document.getElementById("startManualBtn");
+
+  if(status) status.textContent="Listen carefully…";
+  if(listenBtn) listenBtn.disabled=true;
+  if(startBtn) startBtn.disabled=true;
+
+  await waitForVoices();
+
+  const synth=window.speechSynthesis;
+  synth.cancel();
+  synth.resume();
+
+  await new Promise(resolve=>{
+    const u=new SpeechSynthesisUtterance(textToSpeak);
+    const voice=currentListeningVoice || chooseRandomListeningVoice() || preferredVoice;
+    u.lang=(voice && voice.lang) || "en-US";
+    u.rate=listeningSpeechRate;
+    u.pitch=0.94;
+    u.volume=1.0;
+    if(voice) u.voice=voice;
+
+    let finished=false;
+    const done=()=>{
+      if(finished) return;
+      finished=true;
+      resolve();
+    };
+    u.onend=done;
+    u.onerror=done;
+
+    setTimeout(()=>{
+      try{synth.speak(u);}catch(e){done();}
+    },60);
+  });
+
+  buildWordPool(textToSpeak);
+
+  if(status) status.textContent="Now press Start speaking. Google will keep the logical window open until you press Finish.";
+  if(listenBtn) listenBtn.disabled=false;
+  if(startBtn) startBtn.disabled=false;
+}
+
+function buildWordPool(target){
+  const cleanWords=target
+    .replace(/[“”"'!?.,:;()…]/g,"")
+    .split(/\s+/)
+    .filter(Boolean);
+
+  poolWords=shuffleListening(cleanWords.map((word,index)=>({word,index,used:false})));
+  slotWords=new Array(cleanWords.length).fill(null);
+
+  renderWordBuilder(target);
+}
+
+function renderWordBuilder(target){
+  const wrap=document.getElementById("wordPoolWrap");
+  const pool=document.getElementById("wordPool");
+  const slots=document.getElementById("wordSlots");
+  if(!wrap || !pool || !slots) return;
+
+  wrap.classList.remove("hidden");
+
+  slots.innerHTML=slotWords.map((entry,i)=>{
+    const label=entry ? entry.word : "_____";
+    return `<button class="word-slot" data-slot-index="${i}">${label}</button>`;
+  }).join("");
+
+  pool.innerHTML=poolWords.map((entry,i)=>{
+    return `<button class="pool-word" data-pool-index="${i}" ${entry.used ? "disabled" : ""}>${entry.word}</button>`;
+  }).join("");
+
+  pool.querySelectorAll(".pool-word").forEach(btn=>{
+    btn.onclick=()=>{
+      const idx=Number(btn.dataset.poolIndex);
+      const next=slotWords.findIndex(x=>x===null);
+      if(next<0 || poolWords[idx].used) return;
+      slotWords[next]={word:poolWords[idx].word,poolIndex:idx};
+      poolWords[idx].used=true;
+      renderWordBuilder(target);
+      checkWordBuilder(target);
+    };
+  });
+
+  slots.querySelectorAll(".word-slot").forEach(btn=>{
+    btn.onclick=()=>{
+      const idx=Number(btn.dataset.slotIndex);
+      const entry=slotWords[idx];
+      if(!entry) return;
+      poolWords[entry.poolIndex].used=false;
+      slotWords[idx]=null;
+      renderWordBuilder(target);
+      checkWordBuilder(target);
+    };
+  });
+}
+
+function checkWordBuilder(target){
+  const fb=document.getElementById("poolFeedback");
+  if(!fb) return;
+
+  if(slotWords.some(x=>x===null)){
+    fb.textContent="";
+    return;
+  }
+
+  const built=slotWords.map(x=>x.word).join(" ");
+  if(normalizeListening(built)===normalizeListening(target)){
+    fb.innerHTML='<span class="good">Correct word order ✓</span>';
+  }else{
+    fb.innerHTML='<span class="bad">All the words are correct, but the order is not yet right.</span>';
+  }
+}
+
+function initListeningRecognition(){
+  if(listeningRecognition) return listeningRecognition;
+
+  const SR=window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR) return null;
+
+  listeningRecognition=new SR();
+  listeningRecognition.lang="en-US";
+  listeningRecognition.interimResults=true;
+  listeningRecognition.continuous=true;
+  listeningRecognition.maxAlternatives=1;
+
+  listeningRecognition.onstart=()=>{
+    const status=document.getElementById("listeningStatus");
+    if(status) status.textContent="Listening… speak the whole phrase. Press Finish when you are done.";
+  };
+
+  listeningRecognition.onresult=e=>{
+    if(!listeningCaptureActive && !listeningFinishRequested) return;
+
+    listeningInterimBuffer="";
+
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const result=e.results[i];
+      const t=(result[0]?.transcript || "").trim();
+      if(!t) continue;
+
+      if(result.isFinal){
+        listeningFinalBuffer=(listeningFinalBuffer+" "+t).replace(/\s+/g," ").trim();
+      }else{
+        listeningInterimBuffer=t;
+      }
+    }
+
+    updateListeningHeard();
+  };
+
+  listeningRecognition.onend=()=>{
+    if(listeningFinishRequested){
+      setTimeout(evaluateListeningCapture,180);
+      return;
+    }
+
+    if(listeningCaptureActive){
+      if(listeningRestartTimer) clearTimeout(listeningRestartTimer);
+      listeningRestartTimer=setTimeout(()=>{
+        if(!listeningCaptureActive) return;
+        try{listeningRecognition.start();}catch(e){}
+      },120);
+    }
+  };
+
+  listeningRecognition.onerror=e=>{
+    if(listeningFinishRequested) return;
+
+    if(listeningCaptureActive && ["no-speech","aborted"].includes(e.error)){
+      if(listeningRestartTimer) clearTimeout(listeningRestartTimer);
+      listeningRestartTimer=setTimeout(()=>{
+        if(!listeningCaptureActive) return;
+        try{listeningRecognition.start();}catch(err){}
+      },150);
+      return;
+    }
+
+    const status=document.getElementById("listeningStatus");
+    if(status) status.innerHTML=`<span class="bad">Recognition error: ${e.error}</span>`;
+  };
+
+  return listeningRecognition;
+}
+
+function listeningCombinedText(){
+  return [listeningFinalBuffer,listeningInterimBuffer]
+    .filter(Boolean)
+    .join(" ")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function updateListeningHeard(){
+  const heard=document.getElementById("listeningHeard");
+  if(!heard) return;
+
+  const all=listeningCombinedText();
+  heard.innerHTML=all ? `I heard: <b>${all}</b>` : "";
+}
+
+function startListeningCapture(){
+  const rec=initListeningRecognition();
+  const startBtn=document.getElementById("startManualBtn");
+  const finishBtn=document.getElementById("finishManualBtn");
+  const status=document.getElementById("listeningStatus");
+
+  if(!rec){
+    if(status) status.textContent="Speech recognition is not available in this browser.";
+    return;
+  }
+
+  if(listeningRestartTimer){
+    clearTimeout(listeningRestartTimer);
+    listeningRestartTimer=null;
+  }
+
+  listeningFinalBuffer="";
+  listeningInterimBuffer="";
+  listeningFinishRequested=false;
+  listeningEvaluationDone=false;
+  listeningCaptureActive=true;
+
+  const heard=document.getElementById("listeningHeard");
+  if(heard) heard.textContent="";
+
+  if(startBtn) startBtn.disabled=true;
+  if(finishBtn) finishBtn.disabled=false;
+  if(status) status.textContent="Opening microphone…";
+
+  try{
+    rec.start();
+  }catch(e){
+    setTimeout(()=>{
+      if(listeningCaptureActive){
+        try{rec.start();}catch(err){}
+      }
+    },150);
+  }
+}
+
+function stopListeningCapture(cancelOnly){
+  if(listeningRestartTimer){
+    clearTimeout(listeningRestartTimer);
+    listeningRestartTimer=null;
+  }
+
+  if(cancelOnly){
+    listeningCaptureActive=false;
+    listeningFinishRequested=false;
+    listeningEvaluationDone=true;
+    try{listeningRecognition?.abort?.();}catch(e){}
+    return;
+  }
+
+  if(!listeningCaptureActive) return;
+
+  listeningCaptureActive=false;
+  listeningFinishRequested=true;
+
+  const finishBtn=document.getElementById("finishManualBtn");
+  const status=document.getElementById("listeningStatus");
+  if(finishBtn) finishBtn.disabled=true;
+  if(status) status.textContent="Finishing… checking the complete phrase.";
+
+  try{
+    listeningRecognition?.stop?.();
+  }catch(e){
+    setTimeout(evaluateListeningCapture,180);
+  }
+
+  setTimeout(evaluateListeningCapture,500);
+}
+
+function evaluateListeningCapture(){
+  if(listeningEvaluationDone || !listeningFinishRequested) return;
+  listeningEvaluationDone=true;
+  listeningFinishRequested=false;
+
+  const target=LISTENING_SCENES[listeningSceneIndex][listeningSentenceIndex];
+  const heard=listeningCombinedText();
+
+  const status=document.getElementById("listeningStatus");
+  const startBtn=document.getElementById("startManualBtn");
+  const finishBtn=document.getElementById("finishManualBtn");
+
+  if(finishBtn) finishBtn.disabled=true;
+
+  const score=listeningSimilarity(heard,target);
+
+  if(score>=0.76){
+    if(status) status.innerHTML='<span class="good">Correct — whole phrase accepted!</span>';
+    setTimeout(()=>completeListeningPart(false),500);
+  }else{
+    listeningAttempts++;
+    if(status){
+      status.innerHTML=heard
+        ? `<span class="bad">Not quite.</span> I kept the whole manual window. Listen again or try speaking once more.`
+        : `<span class="bad">I did not receive enough speech.</span> Try again.`;
+    }
+    if(startBtn) startBtn.disabled=false;
+
+    // More visual help after repeated misses.
+    if(listeningAttempts>=2){
+      const wrap=document.getElementById("wordPoolWrap");
+      if(wrap) wrap.classList.remove("hidden");
+    }
+  }
+}
+
+function completeListeningPart(skipped){
+  stopListeningCapture(true);
+
+  const phrase=LISTENING_SCENES[listeningSceneIndex][listeningSentenceIndex];
+  const host=document.getElementById("listeningTaskHost");
+
+  host.innerHTML=`
+    <div class="listen-complete">
+      ${phrase}
+    </div>
+    <div class="btn-row" style="justify-content:center">
+      <button class="secondary" id="replayWholeSentenceBtn">🔊 Hear phrase again</button>
+      <button class="primary" id="nextListeningSentenceBtn">
+        ${listeningSentenceIndex === LISTENING_SCENES[listeningSceneIndex].length-1 ? "Finish listening scene ✓" : "Next phrase →"}
+      </button>
+    </div>
+  `;
+
+  document.getElementById("replayWholeSentenceBtn").onclick=()=>speak(phrase);
+  document.getElementById("nextListeningSentenceBtn").onclick=()=>{
+    listeningSentenceIndex++;
+    listeningPartIndex=0;
+
+    if(listeningSentenceIndex>=LISTENING_SCENES[listeningSceneIndex].length){
+      finishListeningScene();
+    }else{
+      renderListeningMode();
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+  };
+}
+
+function finishListeningScene(){
+  stopListeningCapture(true);
+
+  const nextScene=listeningSceneIndex+1;
+
+  stage.innerHTML=`
+    <section class="card finish">
+      <h2>Listening scene complete 🎧</h2>
+      <p>You finished the listening practice for Scene ${listeningSceneIndex+1}.</p>
+      <div class="btn-row" style="justify-content:center">
+        <button class="secondary" id="backToMenuAfterListeningBtn">← Back to menu</button>
+        <button class="secondary" id="returnReadingBtn">← Return to this reading scene</button>
+        <button class="primary" id="continueAfterListeningBtn">${nextScene>=scenes.length ? "Finish story ✓" : "Continue to next reading scene →"}</button>
+      </div>
+    </section>
+  `;
+
+  document.getElementById("backToMenuAfterListeningBtn").onclick=openMainMenu;
+
+  document.getElementById("returnReadingBtn").onclick=()=>{
+    sceneIndex=listeningSceneIndex;
+    renderScene();
+    document.getElementById("vocabCard")?.classList.add("hidden");
+    document.getElementById("storyCard")?.classList.remove("hidden");
+    window.scrollTo({top:0,behavior:"smooth"});
+  };
+
+  document.getElementById("continueAfterListeningBtn").onclick=()=>{
+    if(nextScene>=scenes.length){
+      stage.innerHTML="";
+      sceneIndex=scenes.length;
+      updateProgress();
+      finishCard.classList.remove("hidden");
+      finishCard.scrollIntoView({behavior:"smooth",block:"center"});
+    }else{
+      sceneIndex=nextScene;
+      renderScene();
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+  };
+}
+
+async function speak(text){
+  if(!("speechSynthesis" in window)) return;
+
+  await waitForVoices();
+
+  const synth = window.speechSynthesis;
+  synth.cancel();
+  synth.resume();
+
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = (preferredVoice && preferredVoice.lang) || "en-US";
+  u.rate = 0.82;
+  u.pitch = 0.94;
+  u.volume = 1.0;
+
+  if(preferredVoice) u.voice = preferredVoice;
+
+  // Small delay after cancel() is more reliable in Chromium.
+  setTimeout(()=>{
+    try{
+      synth.speak(u);
+    }catch(err){
+      console.error("[TTS] speak failed:", err);
+    }
+  }, 60);
+}
+
+function normalizeSpeech(s){
+  return (s||"")
+    .toLowerCase()
+    .replace(/i[’']m/g,"i am")
+    .replace(/[’']/g,"")
+    .replace(/wi[\s-]?fi/g,"wifi")
+    .replace(/\b0\b/g,"zero")
+    .replace(/\b1\b/g,"one")
+    .replace(/\b2\b/g,"two")
+    .replace(/\b3\b/g,"three")
+    .replace(/\b4\b/g,"four")
+    .replace(/\b5\b/g,"five")
+    .replace(/\b6\b/g,"six")
+    .replace(/\b7\b/g,"seven")
+    .replace(/\b8\b/g,"eight")
+    .replace(/\b9\b/g,"nine")
+    .replace(/\b10\b/g,"ten")
+    .replace(/\b11\b/g,"eleven")
+    .replace(/\b12\b/g,"twelve")
+    .replace(/\b13\b/g,"thirteen")
+    .replace(/\b14\b/g,"fourteen")
+    .replace(/\b15\b/g,"fifteen")
+    .replace(/\b16\b/g,"sixteen")
+    .replace(/\b17\b/g,"seventeen")
+    .replace(/\b18\b/g,"eighteen")
+    .replace(/\b19\b/g,"nineteen")
+    .replace(/\b20\b/g,"twenty")
+    .replace(/[.,!?;:"]/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function similarity(a,b){
+  const aa = normalizeSpeech(a).split(" ");
+  const bb = normalizeSpeech(b).split(" ");
+  const aset = new Set(aa), bset = new Set(bb);
+  let hit = 0;
+  aset.forEach(w=>{ if(bset.has(w)) hit++; });
+  return hit / Math.max(1, new Set([...aa,...bb]).size);
+}
+
+function renderScene(){
+  menuCard.classList.add("hidden");
+  updateProgress();
+  const s = scenes[sceneIndex];
+  stage.innerHTML = `
+    <section class="card" id="vocabCard">
+      <div class="scene-kicker">Scene ${sceneIndex+1} · Mini-vocabulary</div>
+      <div class="scene-title">${s.title}</div>
+      <div class="tip">Tap a word to reveal the translation and pronunciation hint. Press 🔊 to hear it.</div>
+      <div class="vocab-grid">
+        ${s.vocab.map((v,i)=>`
+          <div class="vocab-item" data-vocab="${i}">
+            <div class="vocab-word">${v[0]}</div>
+            <div class="vocab-meta"><div><b>${v[1]}</b></div><div>${v[2]}</div></div>
+            <div class="vocab-actions">
+              <button type="button" class="secondary vocab-toggle">Show / hide</button>
+              <button type="button" class="secondary vocab-speak">🔊</button>
+            </div>
+          </div>`).join("")}
+      </div>
+      <div class="btn-row">
+        <button class="primary" id="toStoryBtn">Read the scene →</button>
+        <button class="secondary" id="backToMenuFromVocabBtn">← Back to menu</button>
+        <button class="secondary scene-skip" id="skipSceneFromVocabBtn">Skip scene →</button>
+      </div>
+    </section>
+
+    <section class="card hidden" id="storyCard">
+      <div class="scene-kicker">Scene ${sceneIndex+1}</div>
+      <div class="scene-title">${s.title}</div>
+      <div class="word-help" id="wordHelp" aria-live="polite">
+        <span class="word-help-en" id="wordHelpEn"></span>
+        <span class="word-help-ru" id="wordHelpRu"></span>
+        <button type="button" class="secondary" id="wordHelpSpeak">🔊</button>
+      </div>
+      <div class="tip">Click any word in the story to see its Russian translation.</div>
+      <div class="story">${s.story}</div>
+      <div class="btn-row">
+        <button class="primary" id="checkGrammarBtn">Check choices</button>
+        <button class="secondary" id="hearSceneBtn">🔊 Hear scene title</button>
+        <button class="secondary" id="backToMenuFromStoryBtn">← Back to menu</button>
+        <button class="secondary scene-skip" id="skipSceneFromStoryBtn">Skip scene →</button>
+      </div>
+      <div class="feedback" id="grammarFeedback" aria-live="polite"></div>
+
+      <div class="comprehension hidden" id="compBox">
+        <b>${s.question}</b>
+        <div class="answer-list">
+          ${s.answers.map((a,i)=>`<button type="button" class="answer-btn" data-answer-index="${i}">${a}</button>`).join("")}
+        </div>
+        <div class="feedback" id="compFeedback" aria-live="polite"></div>
+      </div>
+
+      <div class="golden hidden" id="goldenBox">
+        <div class="golden-label">Golden Phrase</div>
+        <div class="golden-phrase" id="goldenPhrase">${s.phrase}</div>
+        <div class="btn-row" style="justify-content:center">
+          <button class="secondary" id="hearPhraseBtn">🔊 Hear phrase</button>
+          <button class="primary" id="memoryBtn">I’m ready! Let’s say it!</button>
+          <button class="secondary" id="finishGoldenTopBtn" disabled>■ Finish</button>
+          <button class="secondary hidden" id="tryGoldenAgainBtn">↻ Try again</button>
+          <button class="secondary" id="skipGoldenBtn">Skip Golden Phrase →</button>
+        </div>
+        <div class="speech-box hidden" id="speechBox">
+          <b>🎤 Say it from memory</b>
+          <div class="mic-state" id="micState">Press the microphone button.</div>
+          <div class="btn-row hidden" style="justify-content:center">
+            <button class="primary" id="micBtn">🎤 Start speaking</button>
+            <button class="secondary" id="finishGoldenBtn" disabled>■ Finish</button>
+            <button class="secondary hidden" id="skipSpeechBtn">Skip speaking</button>
+          </div>
+          <div class="heard" id="heardText" aria-live="polite"></div>
+          <div class="hint" id="speechHint"></div>
+        </div>
+      </div>
+
+      <div class="btn-row hidden" id="nextRow">
+        <button class="secondary" id="toListeningBtn">🎧 Listening for this scene</button>
+        <button class="primary" id="nextSceneBtn">${sceneIndex === scenes.length-1 ? "Finish story ✓" : "Next scene →"}</button>
+      </div>
+    </section>
+  `;
+
+  enableClickableStoryWords(document.querySelector("#storyCard .story"));
+
+  document.querySelectorAll(".vocab-item").forEach((item, idx)=>{
+    const v = s.vocab[idx];
+    item.querySelector(".vocab-toggle").addEventListener("click",()=>item.classList.toggle("open"));
+    item.querySelector(".vocab-speak").addEventListener("click",()=>speak(v[0]));
+    item.addEventListener("mouseenter",()=>item.classList.add("open"));
+  });
+
+  document.getElementById("toStoryBtn").addEventListener("click",()=>{
+    document.getElementById("vocabCard").classList.add("hidden");
+    document.getElementById("storyCard").classList.remove("hidden");
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+
+  document.getElementById("backToMenuFromVocabBtn").addEventListener("click", openMainMenu);
+  document.getElementById("backToMenuFromStoryBtn").addEventListener("click", openMainMenu);
+  document.getElementById("skipSceneFromVocabBtn").addEventListener("click", skipCurrentReadingScene);
+  document.getElementById("skipSceneFromStoryBtn").addEventListener("click", skipCurrentReadingScene);
+
+
+  document.getElementById("hearSceneBtn").addEventListener("click",()=>speak(s.title));
+
+  document.getElementById("checkGrammarBtn").addEventListener("click",()=>{
+    const selects = [...document.querySelectorAll("#storyCard select.choice")];
+    let correct = 0;
+    selects.forEach(sel=>{
+      sel.classList.remove("correct","wrong");
+      if(sel.value === sel.dataset.answer){
+        sel.classList.add("correct");
+        correct++;
+      }else{
+        sel.classList.add("wrong");
+      }
+    });
+    const fb = document.getElementById("grammarFeedback");
+    if(correct === selects.length){
+      fb.innerHTML = `<span class="good">Excellent — all ${correct} choices are correct.</span>`;
+      document.getElementById("compBox").classList.remove("hidden");
+      document.getElementById("compBox").scrollIntoView({behavior:"smooth",block:"center"});
+    }else{
+      fb.innerHTML = `<span class="bad">${correct} of ${selects.length} correct.</span> Fix the red choices and check again.`;
+    }
+  });
+
+  document.querySelectorAll(".answer-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const idx = Number(btn.dataset.answerIndex);
+      document.querySelectorAll(".answer-btn").forEach(b=>b.classList.remove("correct","wrong"));
+      const compFb = document.getElementById("compFeedback");
+      if(idx === s.correctAnswer){
+        btn.classList.add("correct");
+        compFb.innerHTML = `<span class="good">Correct — you understood the scene.</span>`;
+        document.getElementById("goldenBox").classList.remove("hidden");
+        document.getElementById("goldenBox").scrollIntoView({behavior:"smooth",block:"center"});
+      }else{
+        btn.classList.add("wrong");
+        compFb.innerHTML = `<span class="bad">Not quite.</span> Read the scene once more and try again.`;
+      }
+    });
+  });
+
+  document.getElementById("hearPhraseBtn").addEventListener("click",()=>speak(s.phrase));
+  document.getElementById("skipGoldenBtn").addEventListener("click",()=>{
+    currentAttempts = 0;
+    stopGoldenCapture(true);
+    completeSpeechOnce();
+    const state = document.getElementById("micState");
+    if(state) state.textContent = "Golden Phrase skipped — continue when ready.";
+  });
+
+
+  document.getElementById("memoryBtn").addEventListener("click",()=>{
+    currentAttempts = 0;
+    beginGoldenRecall(s);
+  });
+
+  document.getElementById("toListeningBtn").addEventListener("click",()=>{
+    openListeningMode(sceneIndex);
+  });
+
+  document.getElementById("nextSceneBtn").addEventListener("click",()=>{
+    sceneIndex++;
+    if(sceneIndex >= scenes.length){
+      stage.innerHTML = "";
+      updateProgress();
+      finishCard.classList.remove("hidden");
+      finishCard.scrollIntoView({behavior:"smooth",block:"center"});
+    }else{
+      renderScene();
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+  });
+}
+
+
+function advanceReadingScene(){
+  sceneIndex++;
+  if(sceneIndex >= scenes.length){
+    stage.innerHTML = "";
+    updateProgress();
+    finishCard.classList.remove("hidden");
+    finishCard.scrollIntoView({behavior:"smooth",block:"center"});
+  }else{
+    renderScene();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+}
+
+function skipCurrentReadingScene(){
+  try{ recognition?.abort?.(); }catch(e){}
+  if("speechSynthesis" in window) speechSynthesis.cancel();
+  advanceReadingScene();
+}
+
+function lookupTranslation(rawWord){
+  const clean = (rawWord || "")
+    .toLowerCase()
+    .replace(/[“”"'!?.,:;()…]/g,"")
+    .replace(/’/g,"'")
+    .trim();
+
+  if(!clean) return "";
+  if(WORD_TRANSLATIONS[clean]) return WORD_TRANSLATIONS[clean];
+  if(IRREGULAR_TRANSLATION_KEYS[clean] && WORD_TRANSLATIONS[IRREGULAR_TRANSLATION_KEYS[clean]]){
+    return WORD_TRANSLATIONS[IRREGULAR_TRANSLATION_KEYS[clean]];
+  }
+
+  const candidates = [];
+  if(clean.endsWith("ies") && clean.length > 4) candidates.push(clean.slice(0,-3) + "y");
+  if(clean.endsWith("ing") && clean.length > 5){
+    candidates.push(clean.slice(0,-3));
+    candidates.push(clean.slice(0,-3) + "e");
+  }
+  if(clean.endsWith("ed") && clean.length > 4){
+    candidates.push(clean.slice(0,-2));
+    candidates.push(clean.slice(0,-1));
+  }
+  if(clean.endsWith("ly") && clean.length > 4) candidates.push(clean.slice(0,-2));
+  if(clean.endsWith("er") && clean.length > 4) candidates.push(clean.slice(0,-2));
+  if(clean.endsWith("est") && clean.length > 5) candidates.push(clean.slice(0,-3));
+  if(clean.endsWith("s") && clean.length > 3) candidates.push(clean.slice(0,-1));
+
+  for(const c of candidates){
+    if(WORD_TRANSLATIONS[c]) return WORD_TRANSLATIONS[c];
+  }
+  return "перевод этого слова пока не добавлен";
+}
+
+function lookupPronunciation(rawWord){
+  const clean = (rawWord || "")
+    .toLowerCase()
+    .replace(/[“”"'!?.,:;()…]/g,"")
+    .replace(/’/g,"'")
+    .trim();
+
+  if(!clean) return "";
+  if(WORD_PRONUNCIATIONS[clean]) return WORD_PRONUNCIATIONS[clean];
+  if(IRREGULAR_TRANSLATION_KEYS[clean] && WORD_PRONUNCIATIONS[IRREGULAR_TRANSLATION_KEYS[clean]]){
+    return WORD_PRONUNCIATIONS[IRREGULAR_TRANSLATION_KEYS[clean]];
+  }
+  const candidates=[];
+  if(clean.endsWith("ing") && clean.length>5){candidates.push(clean.slice(0,-3));candidates.push(clean.slice(0,-3)+"e");}
+  if(clean.endsWith("ed") && clean.length>4){candidates.push(clean.slice(0,-2));candidates.push(clean.slice(0,-1));}
+  if(clean.endsWith("ly") && clean.length>4)candidates.push(clean.slice(0,-2));
+  if(clean.endsWith("er") && clean.length>4)candidates.push(clean.slice(0,-2));
+  if(clean.endsWith("est") && clean.length>5)candidates.push(clean.slice(0,-3));
+  if(clean.endsWith("s") && clean.length>3)candidates.push(clean.slice(0,-1));
+  for(const c of candidates){if(WORD_PRONUNCIATIONS[c]) return WORD_PRONUNCIATIONS[c];}
+  return "";
+}
+
+
+function enableClickableStoryWords(root){
+  if(!root) return;
+
+  const walker = document.createTreeWalker(
+    root,
+    NodeFilter.SHOW_TEXT,
+    {
+      acceptNode(node){
+        const parent = node.parentElement;
+        if(!parent) return NodeFilter.FILTER_REJECT;
+        if(parent.closest("select, option, button, script, style")) return NodeFilter.FILTER_REJECT;
+        if(!/[A-Za-z]/.test(node.nodeValue || "")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    }
+  );
+
+  const nodes = [];
+  while(walker.nextNode()) nodes.push(walker.currentNode);
+
+  nodes.forEach(node=>{
+    const parts = node.nodeValue.split(/([A-Za-z]+(?:[’'][A-Za-z]+)?(?:-[A-Za-z]+)?)/g);
+    if(parts.length <= 1) return;
+
+    const frag = document.createDocumentFragment();
+    parts.forEach(part=>{
+      if(/^[A-Za-z]+(?:[’'][A-Za-z]+)?(?:-[A-Za-z]+)?$/.test(part)){
+        const span = document.createElement("span");
+        span.className = "story-word";
+        span.textContent = part;
+        span.tabIndex = 0;
+        span.setAttribute("role","button");
+        span.setAttribute("aria-label", part + " — show Russian translation");
+        const activate = ()=>{
+          document.querySelectorAll(".story-word.active").forEach(x=>x.classList.remove("active"));
+          span.classList.add("active");
+          const help = document.getElementById("wordHelp");
+          const en = document.getElementById("wordHelpEn");
+          const ru = document.getElementById("wordHelpRu");
+          const sound = document.getElementById("wordHelpSpeak");
+          if(help && en && ru && sound){
+            en.textContent = part;
+            ru.textContent = "— " + lookupTranslation(part) + (lookupPronunciation(part) ? " — " + lookupPronunciation(part) : "");
+            help.classList.add("open");
+            sound.onclick = ()=>speak(part);
+          }
+        };
+        span.addEventListener("click",activate);
+        span.addEventListener("keydown",(e)=>{
+          if(e.key === "Enter" || e.key === " "){
+            e.preventDefault();
+            activate();
+          }
+        });
+        frag.appendChild(span);
+      }else{
+        frag.appendChild(document.createTextNode(part));
+      }
+    });
+    node.replaceWith(frag);
+  });
+}
+
+
+function initGoldenRecognition(){
+  if(goldenRecognition) return goldenRecognition;
+  const SR=window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR) return null;
+
+  goldenRecognition=new SR();
+  goldenRecognition.lang="en-US";
+  goldenRecognition.interimResults=true;
+  goldenRecognition.continuous=true;
+  goldenRecognition.maxAlternatives=1;
+
+  goldenRecognition.onstart=()=>{
+    const state=document.getElementById("micState");
+    if(state) state.textContent="Listening… say the whole Golden Phrase. Press Finish when you are done.";
+  };
+
+  goldenRecognition.onresult=e=>{
+    if(!goldenCaptureActive && !goldenFinishRequested) return;
+    goldenInterimBuffer="";
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const result=e.results[i];
+      const t=(result[0]?.transcript || "").trim();
+      if(!t) continue;
+      if(result.isFinal){
+        goldenFinalBuffer=(goldenFinalBuffer+" "+t).replace(/\s+/g," ").trim();
+      }else{
+        goldenInterimBuffer=t;
+      }
+    }
+    updateGoldenHeard();
+  };
+
+  goldenRecognition.onend=()=>{
+    if(goldenFinishRequested){
+      setTimeout(evaluateGoldenCapture,180);
+      return;
+    }
+    if(goldenCaptureActive){
+      if(goldenRestartTimer) clearTimeout(goldenRestartTimer);
+      goldenRestartTimer=setTimeout(()=>{
+        if(!goldenCaptureActive) return;
+        try{goldenRecognition.start();}catch(e){}
+      },120);
+    }
+  };
+
+  goldenRecognition.onerror=e=>{
+    if(goldenFinishRequested) return;
+    if(goldenCaptureActive && ["no-speech","aborted"].includes(e.error)){
+      if(goldenRestartTimer) clearTimeout(goldenRestartTimer);
+      goldenRestartTimer=setTimeout(()=>{
+        if(!goldenCaptureActive) return;
+        try{goldenRecognition.start();}catch(err){}
+      },150);
+      return;
+    }
+    const state=document.getElementById("micState");
+    if(state) state.innerHTML=`<span class="bad">Recognition error: ${e.error}</span>`;
+  };
+  return goldenRecognition;
+}
+
+function goldenCombinedText(){
+  return [goldenFinalBuffer,goldenInterimBuffer]
+    .filter(Boolean).join(" ").replace(/\s+/g," ").trim();
+}
+
+function updateGoldenHeard(){
+  const heard=document.getElementById("heardText");
+  if(!heard) return;
+  const all=goldenCombinedText();
+  heard.innerHTML=all ? `I heard: <b>${all}</b>` : "";
+}
+
+function beginGoldenRecall(scene){
+  stopGoldenCapture(true);
+  goldenTargetScene=scene;
+  currentAttempts=0;
+
+  const gp=document.getElementById("goldenPhrase");
+  const readyBtn=document.getElementById("memoryBtn");
+  const hearBtn=document.getElementById("hearPhraseBtn");
+  const speechBox=document.getElementById("speechBox");
+  const finishTop=document.getElementById("finishGoldenTopBtn");
+  const tryAgain=document.getElementById("tryGoldenAgainBtn");
+
+  if(readyBtn) readyBtn.disabled=true;
+  if(hearBtn) hearBtn.disabled=true;
+  if(speechBox) speechBox.classList.remove("hidden");
+  if(tryAgain) tryAgain.classList.add("hidden");
+  if(finishTop){
+    finishTop.disabled=true;
+    finishTop.onclick=()=>stopGoldenCapture(false);
+  }
+
+  setupGoldenManualControls(scene);
+  startGoldenCapture();
+  startGoldenVisualLoop(scene);
+}
+
+function startGoldenVisualLoop(scene){
+  const gp=document.getElementById("goldenPhrase");
+  if(!gp || !scene) return;
+
+  if(goldenRetryTimer){
+    clearTimeout(goldenRetryTimer);
+    goldenRetryTimer=null;
+  }
+
+  gp.classList.remove("recall-fade");
+  gp.textContent=scene.phrase;
+  gp.removeAttribute("aria-hidden");
+  void gp.offsetWidth;
+  gp.classList.add("recall-fade");
+
+  goldenRetryTimer=setTimeout(()=>{
+    if(!goldenCaptureActive) return;
+
+    gp.classList.remove("recall-fade");
+    gp.textContent=scene.phrase;
+    gp.removeAttribute("aria-hidden");
+    void gp.offsetWidth;
+
+    goldenRetryTimer=setTimeout(()=>{
+      if(!goldenCaptureActive) return;
+      startGoldenVisualLoop(scene);
+    },900);
+  },6000);
+}
+
+function setupGoldenManualControls(scene){
+  goldenTargetScene=scene;
+  const finishTop=document.getElementById("finishGoldenTopBtn");
+  const skipBtn=document.getElementById("skipSpeechBtn");
+  const state=document.getElementById("micState");
+  const heard=document.getElementById("heardText");
+  const hint=document.getElementById("speechHint");
+
+  if(heard) heard.textContent="";
+  if(hint) hint.textContent="";
+  if(finishTop){
+    finishTop.disabled=true;
+    finishTop.onclick=()=>stopGoldenCapture(false);
+  }
+  if(skipBtn) skipBtn.onclick=completeSpeechOnce;
+  if(state) state.textContent="Opening microphone… Speak while the phrase slowly disappears.";
+}
+
+function startGoldenCapture(){
+  const rec=initGoldenRecognition();
+  const finishTop=document.getElementById("finishGoldenTopBtn");
+  const state=document.getElementById("micState");
+
+  if(!rec){
+    if(state) state.textContent="Speech recognition is not available in this browser.";
+    const skip=document.getElementById("skipSpeechBtn");
+    if(skip) skip.classList.remove("hidden");
+    return;
+  }
+
+  if(goldenRestartTimer){
+    clearTimeout(goldenRestartTimer);
+    goldenRestartTimer=null;
+  }
+
+  goldenFinalBuffer="";
+  goldenInterimBuffer="";
+  goldenFinishRequested=false;
+  goldenEvaluationDone=false;
+  goldenCaptureActive=true;
+
+  const heard=document.getElementById("heardText");
+  if(heard) heard.textContent="";
+  if(finishTop) finishTop.disabled=false;
+  if(state) state.textContent="Opening microphone… Speak while the phrase slowly disappears.";
+
+  try{rec.start();}
+  catch(e){
+    setTimeout(()=>{
+      if(goldenCaptureActive){
+        try{rec.start();}catch(err){}
+      }
+    },150);
+  }
+}
+
+function stopGoldenCapture(cancelOnly){
+  if(goldenRetryTimer){
+    clearTimeout(goldenRetryTimer);
+    goldenRetryTimer=null;
+  }
+  if(goldenRestartTimer){
+    clearTimeout(goldenRestartTimer);
+    goldenRestartTimer=null;
+  }
+
+  if(cancelOnly){
+    goldenCaptureActive=false;
+    goldenFinishRequested=false;
+    goldenEvaluationDone=true;
+    try{goldenRecognition?.abort?.();}catch(e){}
+    return;
+  }
+
+  if(!goldenCaptureActive) return;
+  goldenCaptureActive=false;
+  goldenFinishRequested=true;
+
+  const finishTop=document.getElementById("finishGoldenTopBtn");
+  const state=document.getElementById("micState");
+  if(finishTop) finishTop.disabled=true;
+  if(state) state.textContent="Finishing… checking the complete phrase.";
+
+  try{goldenRecognition?.stop?.();}
+  catch(e){setTimeout(evaluateGoldenCapture,180);}
+  setTimeout(evaluateGoldenCapture,500);
+}
+
+function evaluateGoldenCapture(){
+  if(goldenEvaluationDone || !goldenFinishRequested || !goldenTargetScene) return;
+  goldenEvaluationDone=true;
+  goldenFinishRequested=false;
+
+  const heard=goldenCombinedText();
+  const accepted=goldenTargetScene.accepted.map(normalizeSpeech);
+  const normalized=normalizeSpeech(heard);
+  let ok=accepted.includes(normalized);
+  let bestScore=0;
+  accepted.forEach(a=>bestScore=Math.max(bestScore,similarity(normalized,a)));
+  if(!ok && bestScore>=0.78) ok=true;
+
+  const state=document.getElementById("micState");
+  const hint=document.getElementById("speechHint");
+
+  if(ok){
+    if(state) state.innerHTML='<span class="good">Great — phrase accepted!</span>';
+    if(hint) hint.textContent="";
+    completeSpeechOnce();
+    return;
+  }
+
+  currentAttempts++;
+  if(state){
+    state.innerHTML=heard
+      ? '<span class="bad">Not quite.</span> The Golden Phrase will appear again, then disappear for another try.'
+      : '<span class="bad">I did not receive enough speech.</span> The phrase will appear again.';
+  }
+  const h=goldenTargetScene.hints[Math.min(currentAttempts-1,goldenTargetScene.hints.length-1)];
+  if(hint) hint.textContent="Hint: "+h;
+
+  const gp=document.getElementById("goldenPhrase");
+  const tryAgain=document.getElementById("tryGoldenAgainBtn");
+  if(goldenRetryTimer){
+    clearTimeout(goldenRetryTimer);
+    goldenRetryTimer=null;
+  }
+  if(gp){
+    gp.classList.remove("recall-fade");
+    gp.textContent=goldenTargetScene.phrase;
+    gp.removeAttribute("aria-hidden");
+  }
+  if(tryAgain){
+    tryAgain.classList.remove("hidden");
+    tryAgain.onclick=()=>{
+      tryAgain.classList.add("hidden");
+      setupGoldenManualControls(goldenTargetScene);
+      startGoldenCapture();
+      startGoldenVisualLoop(goldenTargetScene);
+    };
+  }
+  if(state) state.innerHTML += ' Press <b>Try again</b> when you are ready.';
+}
+
+function initRecognitionOnce(){
+  if(recognition) return recognition;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR) return null;
+
+  recognition = new SR();
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 3;
+  recognition.continuous = false;
+
+  recognition.onstart = ()=>{
+    const micState = document.getElementById("micState");
+    const micBtn = document.getElementById("micBtn");
+    if(micState) micState.textContent = "Listening…";
+    if(micBtn) micBtn.disabled = true;
+  };
+
+  recognition.onerror = (e)=>{
+    const micState = document.getElementById("micState");
+    const micBtn = document.getElementById("micBtn");
+    const skipBtn = document.getElementById("skipSpeechBtn");
+    if(micState) micState.textContent = "Recognition error: " + e.error;
+    if(micBtn) micBtn.disabled = false;
+    if(skipBtn) skipBtn.classList.remove("hidden");
+  };
+
+  recognition.onend = ()=>{
+    const micBtn = document.getElementById("micBtn");
+    const micState = document.getElementById("micState");
+    if(micBtn && !document.getElementById("nextRow")?.classList.contains("hidden")){
+      micBtn.disabled = true;
+      return;
+    }
+    if(micBtn) micBtn.disabled = false;
+    if(micState && micState.textContent === "Listening…"){
+      micState.textContent = "Stopped. You can try again.";
+    }
+  };
+
+  recognition.onresult = (e)=>{
+    if(!activeSpeechScene) return;
+
+    const alternatives = [];
+    for(let i=0;i<e.results[0].length;i++){
+      alternatives.push(e.results[0][i].transcript);
+    }
+
+    const heardText = document.getElementById("heardText");
+    const micState = document.getElementById("micState");
+    const hint = document.getElementById("speechHint");
+    const skipBtn = document.getElementById("skipSpeechBtn");
+
+    const best = alternatives[0] || "";
+    if(heardText) heardText.innerHTML = `I heard: <b>${best}</b>`;
+
+    const accepted = activeSpeechScene.accepted.map(normalizeSpeech);
+    let ok = false;
+    let bestScore = 0;
+
+    alternatives.forEach(t=>{
+      const n = normalizeSpeech(t);
+      if(accepted.includes(n)) ok = true;
+      accepted.forEach(a=>bestScore = Math.max(bestScore, similarity(n,a)));
+    });
+
+    if(!ok && bestScore >= 0.78) ok = true;
+
+    if(ok){
+      if(micState) micState.innerHTML = `<span class="good">Great — phrase accepted!</span>`;
+      if(hint) hint.textContent = "";
+      completeSpeechOnce();
+    }else{
+      currentAttempts++;
+      if(micState) micState.innerHTML = `<span class="bad">Almost — try once more.</span>`;
+      const h = activeSpeechScene.hints[Math.min(currentAttempts-1, activeSpeechScene.hints.length-1)];
+      if(hint) hint.textContent = "Hint: " + h;
+      if(currentAttempts >= 2 && skipBtn) skipBtn.classList.remove("hidden");
+    }
+  };
+
+  return recognition;
+}
+
+function setupRecognition(scene){
+  activeSpeechScene = scene;
+  const micBtn = document.getElementById("micBtn");
+  const skipBtn = document.getElementById("skipSpeechBtn");
+  const micState = document.getElementById("micState");
+  const heardText = document.getElementById("heardText");
+  const hint = document.getElementById("speechHint");
+
+  if(heardText) heardText.textContent = "";
+  if(hint) hint.textContent = "";
+
+  const rec = initRecognitionOnce();
+  if(!rec){
+    if(micBtn) micBtn.disabled = true;
+    if(micState) micState.textContent = "Speech recognition is not available in this browser.";
+    if(skipBtn){
+      skipBtn.classList.remove("hidden");
+      skipBtn.onclick = completeSpeechOnce;
+    }
+    return;
+  }
+
+  if(micState){
+    micState.textContent = microphonePrimed
+      ? "Microphone is ready. Listening will start after the phrase disappears."
+      : "Microphone is ready. Your browser may still ask for access.";
+  }
+
+  if(micBtn){
+    micBtn.disabled = false;
+    micBtn.onclick = ()=>{
+      try{
+        rec.start();
+      }catch(err){
+        if(micState) micState.textContent = "Already listening or not ready yet. Try once more.";
+      }
+    };
+  }
+
+  if(skipBtn){
+    skipBtn.onclick = completeSpeechOnce;
+  }
+}
+
+let speechCompletedFlag = false;
+function completeSpeechOnce(){
+  stopGoldenCapture(true);
+  const nextRow = document.getElementById("nextRow");
+  if(nextRow) nextRow.classList.remove("hidden");
+  const micBtn = document.getElementById("micBtn");
+  if(micBtn) micBtn.disabled = true;
+  const finishTop = document.getElementById("finishGoldenTopBtn");
+  if(finishTop) finishTop.disabled = true;
+  const tryAgain = document.getElementById("tryGoldenAgainBtn");
+  if(tryAgain) tryAgain.classList.add("hidden");
+  const skipBtn = document.getElementById("skipSpeechBtn");
+  if(skipBtn) skipBtn.classList.add("hidden");
+  const micState = document.getElementById("micState");
+  if(micState && !micState.innerHTML.includes("Great")) micState.textContent = "Speaking step skipped — continue when ready.";
+}
+
+refreshVoices();
+if("speechSynthesis" in window && "onvoiceschanged" in window.speechSynthesis){
+  window.speechSynthesis.addEventListener("voiceschanged", refreshVoices);
+}
+waitForVoices();
+
+window.addEventListener("beforeunload", ()=>{
+  if(keepAliveMicStream){
+    keepAliveMicStream.getTracks().forEach(track => track.stop());
+  }
+});
+
+updateProgress();
+</script>
+</body>
+</html>
